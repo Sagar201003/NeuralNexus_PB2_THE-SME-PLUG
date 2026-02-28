@@ -1,0 +1,116 @@
+# Legal / Contract Review DNA Capsule
+# ======================================
+# Expert: Senior Contract Lawyer
+# Focus: NDA, contract review, jurisdiction analysis
+
+name: "Legal Contract Analyst"
+version: "1.0.0"
+domain_id: "legal"
+description: "SME capsule for contract review, NDA analysis, clause identification, jurisdiction-aware assessment, and legal risk evaluation."
+
+expert_persona: |
+  You are a senior contract lawyer with 20 years of experience in commercial law.
+  Your specializations include:
+  - Non-Disclosure Agreement (NDA) review and drafting
+  - Contract clause analysis (indemnification, limitation of liability, termination)
+  - Jurisdiction and governing law assessment
+  - Intellectual property and confidentiality provisions
+  - Risk identification in commercial agreements
+  
+  You ALWAYS specify which jurisdiction's law applies to your analysis.
+  You cite specific contract clauses by section number when referencing document content.
+  You flag high-risk clauses with ⚠️ warnings.
+  You explicitly state when your analysis is general guidance and NOT legal advice.
+  You recommend legal counsel review for binding decisions.
+
+triggers:
+  keywords:
+    - contract
+    - NDA
+    - non-disclosure
+    - agreement
+    - clause
+    - indemnification
+    - liability
+    - termination
+    - jurisdiction
+    - governing law
+    - intellectual property
+    - confidentiality
+    - breach
+    - remedy
+    - arbitration
+    - force majeure
+    - warranty
+    - representation
+    - covenant
+    - obligation
+    - party
+    - enforceable
+    - binding
+    - amendment
+    - severability
+    - assignment
+    - consideration
+  regex_patterns:
+    - "(NDA|non-disclosure)\\s*(agreement|contract)"
+    - "(clause|section|article)\\s*\\d+"
+    - "(governing|applicable)\\s*law"
+    - "(indemnif|liabilit|terminat)"
+    - "(enforceable|binding|valid)"
+  min_keyword_hits: 2
+  seed_queries:
+    - "Is this NDA enforceable in California?"
+    - "Review the indemnification clause in this contract"
+    - "What are the key risks in this service agreement?"
+    - "Does this non-compete clause hold up in New York?"
+    - "Analyze the limitation of liability in Section 8"
+    - "What jurisdiction governs this cross-border agreement?"
+    - "Is the termination clause mutual or one-sided?"
+    - "Review force majeure provisions for adequacy"
+    - "Does this IP assignment clause cover future inventions?"
+    - "What are the standard confidentiality obligations in an NDA?"
+    - "Is the arbitration clause binding?"
+    - "Review the warranty disclaimers in this SaaS agreement"
+    - "What remedies are available for breach of this contract?"
+    - "Analyze the assignment and transfer restrictions"
+    - "Is the consideration adequate for this agreement?"
+
+rag:
+  top_k_bm25: 20
+  top_k_dense: 20
+  top_k_reranked: 5
+  use_hyde: true
+  chunk_size: 512
+  chunk_overlap: 64
+  embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+
+guardrails:
+  min_confidence: 0.55
+  require_citations: true
+  hallucination_threshold: 0.35
+  domain_validation_rules:
+    - rule: "jurisdiction_mention"
+      pattern: "(jurisdiction|governing law|applicable law|state law|federal law)"
+      message: "Legal analysis should specify applicable jurisdiction."
+    - rule: "not_legal_advice"
+      pattern: "(not legal advice|general guidance|consult.*attorney)"
+      message: "Response should include disclaimer that this is not legal advice."
+  forbidden_phrases:
+    - "definitely enforceable"
+    - "guaranteed to win"
+    - "100% legal"
+    - "no risk at all"
+    - "always valid"
+
+knowledge_dir: "knowledge"
+decision_tree_path: "decision_tree.json"
+
+sources_of_truth:
+  - "Restatement (Second) of Contracts"
+  - "Uniform Commercial Code (UCC)"
+  - "Black's Law Dictionary"
+  - "Standard NDA Templates and Precedents"
+  - "International Chamber of Commerce (ICC) Rules"
+
+fallback_message: "I cannot provide sufficiently grounded legal analysis for this query. Please consult a licensed attorney in the relevant jurisdiction for binding legal guidance."

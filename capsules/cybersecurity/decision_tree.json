@@ -1,0 +1,119 @@
+{
+    "name": "Incident Triage Decision Tree",
+    "version": "1.0.0",
+    "root": "start",
+    "nodes": [
+        {
+            "id": "start",
+            "label": "Detect & Classify Alert",
+            "question": "What type of security event/alert is this?"
+        },
+        {
+            "id": "severity_assess",
+            "label": "Assess Severity (CVSS/Impact)",
+            "question": "What is the severity level — Critical, High, Medium, or Low?"
+        },
+        {
+            "id": "ioc_check",
+            "label": "Identify Indicators of Compromise",
+            "question": "Are there known IOCs (IPs, hashes, domains, TTPs)?"
+        },
+        {
+            "id": "mitre_mapping",
+            "label": "Map to MITRE ATT&CK",
+            "question": "Which tactics and techniques (TXXXX) does this map to?"
+        },
+        {
+            "id": "scope_analysis",
+            "label": "Determine Scope & Impact",
+            "question": "How many systems/users are affected? Is data at risk?"
+        },
+        {
+            "id": "containment",
+            "label": "Initiate Containment",
+            "question": "Isolate affected systems, block malicious IPs/domains, disable compromised accounts."
+        },
+        {
+            "id": "evidence_preserve",
+            "label": "Preserve Evidence",
+            "question": "Collect logs, memory dumps, network captures for forensics."
+        },
+        {
+            "id": "remediation",
+            "label": "Remediate & Recover",
+            "question": "Patch vulnerabilities, restore from backups, reset credentials."
+        },
+        {
+            "id": "lessons_learned",
+            "label": "Post-Incident Review",
+            "question": "Document timeline, root cause, and improvements."
+        },
+        {
+            "id": "escalate",
+            "label": "Escalate to IR Team ⚠️",
+            "question": "Critical severity or APT indicators — escalate immediately."
+        },
+        {
+            "id": "false_positive",
+            "label": "Mark as False Positive",
+            "question": "Confirmed benign — tune detection rules to reduce noise."
+        }
+    ],
+    "edges": [
+        {
+            "from": "start",
+            "to": "severity_assess",
+            "condition": "Alert classified"
+        },
+        {
+            "from": "severity_assess",
+            "to": "escalate",
+            "condition": "Critical severity"
+        },
+        {
+            "from": "severity_assess",
+            "to": "ioc_check",
+            "condition": "High/Medium/Low severity"
+        },
+        {
+            "from": "ioc_check",
+            "to": "false_positive",
+            "condition": "No IOCs, confirmed benign"
+        },
+        {
+            "from": "ioc_check",
+            "to": "mitre_mapping",
+            "condition": "IOCs identified"
+        },
+        {
+            "from": "mitre_mapping",
+            "to": "scope_analysis",
+            "condition": "TTPs mapped"
+        },
+        {
+            "from": "scope_analysis",
+            "to": "escalate",
+            "condition": "Wide impact or data breach"
+        },
+        {
+            "from": "scope_analysis",
+            "to": "containment",
+            "condition": "Limited scope"
+        },
+        {
+            "from": "containment",
+            "to": "evidence_preserve",
+            "condition": "Systems isolated"
+        },
+        {
+            "from": "evidence_preserve",
+            "to": "remediation",
+            "condition": "Evidence collected"
+        },
+        {
+            "from": "remediation",
+            "to": "lessons_learned",
+            "condition": "Systems restored"
+        }
+    ]
+}

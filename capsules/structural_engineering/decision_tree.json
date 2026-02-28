@@ -1,0 +1,33 @@
+{
+  "name": "Structural Analysis Decision Tree",
+  "version": "1.0.0",
+  "root": "start",
+  "nodes": [
+    {"id": "start", "label": "Identify Structure Type", "question": "What type of structural element is being analyzed?"},
+    {"id": "load_identification", "label": "Identify Applied Loads", "question": "What loads act on the structure (dead, live, wind, seismic)?"},
+    {"id": "load_combination", "label": "Apply Load Combinations", "question": "Combine loads per code requirements (e.g., 1.5DL + 1.5LL per IS 456, or LRFD per AISC)."},
+    {"id": "material_check", "label": "Verify Material Properties", "question": "Confirm material grade, yield strength, and allowable stress."},
+    {"id": "section_analysis", "label": "Analyze Section Capacity", "question": "Calculate moment, shear, and axial capacity of the section."},
+    {"id": "demand_vs_capacity", "label": "Compare Demand vs Capacity", "question": "Is the demand (applied loads) within the section capacity?"},
+    {"id": "deflection_check", "label": "Check Serviceability (Deflection)", "question": "Is deflection within L/360 (or applicable code limit)?"},
+    {"id": "stability_check", "label": "Check Stability (Buckling)", "question": "Check for local/global buckling, lateral-torsional buckling."},
+    {"id": "connection_check", "label": "Verify Connections", "question": "Are connections (welds, bolts, splices) adequately designed?"},
+    {"id": "pass", "label": "Design PASSES ✅", "question": ""},
+    {"id": "fail", "label": "Design FAILS ⚠️ — Revise Section", "question": "Increase member size, add reinforcement, or change connection detail."}
+  ],
+  "edges": [
+    {"from": "start", "to": "load_identification", "condition": "Structure type identified"},
+    {"from": "load_identification", "to": "load_combination", "condition": "All loads catalogued"},
+    {"from": "load_combination", "to": "material_check", "condition": "Load combinations computed"},
+    {"from": "material_check", "to": "section_analysis", "condition": "Material properties confirmed"},
+    {"from": "section_analysis", "to": "demand_vs_capacity", "condition": "Section capacity calculated"},
+    {"from": "demand_vs_capacity", "to": "deflection_check", "condition": "Demand ≤ Capacity"},
+    {"from": "demand_vs_capacity", "to": "fail", "condition": "Demand > Capacity"},
+    {"from": "deflection_check", "to": "stability_check", "condition": "Deflection within limits"},
+    {"from": "deflection_check", "to": "fail", "condition": "Deflection exceeds limits"},
+    {"from": "stability_check", "to": "connection_check", "condition": "No buckling issues"},
+    {"from": "stability_check", "to": "fail", "condition": "Buckling risk identified"},
+    {"from": "connection_check", "to": "pass", "condition": "Connections adequate"},
+    {"from": "connection_check", "to": "fail", "condition": "Connections inadequate"}
+  ]
+}

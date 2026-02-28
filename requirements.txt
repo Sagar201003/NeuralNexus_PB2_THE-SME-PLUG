@@ -1,0 +1,70 @@
+# ============================================================
+#   ExpertCore SME-PLUG — Full Dependency List
+# ============================================================
+
+# ── Core LLM & Orchestration ─────────────────────────────────
+openai>=1.14.0
+langchain>=0.2.0
+langchain-community>=0.2.0
+langchain-openai>=0.1.6
+langchain-core>=0.2.0
+crewai>=0.30.0
+
+# ── Advanced RAG Stack ───────────────────────────────────────
+# Vector Stores
+chromadb>=0.5.0
+faiss-cpu>=1.8.0
+pinecone-client>=3.2.2          # optional cloud vector store
+
+# Embeddings
+sentence-transformers>=2.7.0
+transformers>=4.40.0
+torch>=2.2.0                    # needed by sentence-transformers
+
+# Advanced Retrieval
+rank-bm25>=0.2.2                # BM25 hybrid retrieval
+flashrank>=0.2.0                # lightweight cross-encoder reranker
+cohere>=5.3.0                   # Cohere reranker (optional but powerful)
+
+# HyDE + Query Expansion
+langchain-experimental>=0.0.59  # HypotheticalDocumentEmbedder etc.
+
+# Document Loaders & Parsers
+pypdf>=4.2.0
+python-docx>=1.1.0
+unstructured>=0.13.0            # handles PDFs, HTML, DOCX, PPTX etc.
+beautifulsoup4>=4.12.0
+lxml>=5.2.0
+pymupdf>=1.24.0                 # fast PDF parsing (fitz)
+
+# ── Decision Tree & Reasoning Engine ─────────────────────────
+networkx>=3.3
+pydantic>=2.7.0
+pydantic-settings>=2.2.0
+
+# ── Hallucination Guardrails ──────────────────────────────────
+guardrails-ai>=0.5.0
+nltk>=3.8.1
+spacy>=3.7.4
+
+# ── Capsule / Config Management ───────────────────────────────
+pyyaml>=6.0.1
+jsonschema>=4.22.0
+python-dotenv>=1.0.1
+
+# ── API & Serving Layer ───────────────────────────────────────
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+httpx>=0.27.0
+
+# ── Observability & Logging ───────────────────────────────────
+loguru>=0.7.2
+rich>=13.7.1
+langfuse>=2.29.0                # LLM tracing (optional)
+
+# ── Dev & Testing ─────────────────────────────────────────────
+pytest>=8.2.0
+pytest-asyncio>=0.23.6
+black>=24.4.0
+ruff>=0.4.4
+ipython>=8.24.0

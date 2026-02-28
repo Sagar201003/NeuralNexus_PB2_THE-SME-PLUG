@@ -1,0 +1,106 @@
+# Cybersecurity Knowledge Base
+# ==============================
+# Reference data for SOC analysis, MITRE ATT&CK, NIST controls
+
+## MITRE ATT&CK — Key Tactics and Techniques
+
+### Tactic: Initial Access (TA0001)
+- T1566 — Phishing: Adversaries send phishing messages to gain access. Subtechniques:
+  - T1566.001 — Spearphishing Attachment: Malicious files sent via email.
+  - T1566.002 — Spearphishing Link: Malicious URLs in email body.
+  - T1566.003 — Spearphishing via Service: Phishing through social media or messaging.
+
+### Tactic: Execution (TA0002)
+- T1059 — Command and Scripting Interpreter:
+  - T1059.001 — PowerShell: Malicious PowerShell commands/scripts.
+  - T1059.003 — Windows Command Shell: cmd.exe abuse.
+  - T1059.004 — Unix Shell: Bash/sh script execution.
+
+### Tactic: Persistence (TA0003)
+- T1547 — Boot or Logon Autostart Execution:
+  - T1547.001 — Registry Run Keys: Adding entries to HKCU/HKLM\...\Run.
+- T1053 — Scheduled Task/Job: Creating scheduled tasks for persistence.
+
+### Tactic: Privilege Escalation (TA0004)
+- T1548 — Abuse Elevation Control Mechanism:
+  - T1548.002 — Bypass User Account Control (UAC).
+- T1068 — Exploitation for Privilege Escalation: Using software vulnerabilities.
+
+### Tactic: Defense Evasion (TA0005)
+- T1070 — Indicator Removal:
+  - T1070.001 — Clear Windows Event Logs.
+  - T1070.004 — File Deletion to remove artifacts.
+- T1027 — Obfuscated Files or Information: Encoding/encrypting payloads.
+
+### Tactic: Lateral Movement (TA0008)
+- T1021 — Remote Services:
+  - T1021.001 — Remote Desktop Protocol (RDP).
+  - T1021.002 — SMB/Windows Admin Shares.
+  - T1021.004 — SSH lateral movement.
+- T1570 — Lateral Tool Transfer: Moving tools between systems.
+
+### Tactic: Exfiltration (TA0010)
+- T1048 — Exfiltration Over Alternative Protocol:
+  - T1048.001 — Exfiltration over symmetric encrypted non-C2 protocol.
+  - T1048.003 — DNS tunneling for data exfiltration.
+
+
+## NIST SP 800-53 Rev. 5 — Selected Controls
+
+### Access Control (AC)
+- AC-2: Account Management — Establish conditions for group/role membership.
+- AC-3: Access Enforcement — Enforce approved authorizations.
+- AC-6: Least Privilege — Employ the principle of least privilege.
+- AC-17: Remote Access — Establish usage restrictions for remote access.
+
+### Audit and Accountability (AU)
+- AU-2: Event Logging — Identify events that need auditing.
+- AU-3: Content of Audit Records — Ensure records contain sufficient information.
+- AU-6: Audit Record Review, Analysis, and Reporting — Review logs regularly.
+
+### Incident Response (IR)
+- IR-1: Incident Response Policy and Procedures.
+- IR-4: Incident Handling — Implement incident handling capability.
+- IR-5: Incident Monitoring — Track and document incidents.
+- IR-6: Incident Reporting — Report incidents to appropriate authorities.
+- IR-8: Incident Response Plan — Develop and maintain IR plan.
+
+### System and Information Integrity (SI)
+- SI-2: Flaw Remediation — Identify, report, and correct flaws.
+- SI-3: Malicious Code Protection — Implement anti-malware.
+- SI-4: System Monitoring — Monitor system for attacks and indicators.
+
+
+## CVSS v3.1 Severity Ratings
+
+| Score Range | Severity  | Response Time  |
+|-------------|-----------|----------------|
+| 9.0-10.0    | Critical  | Immediate      |
+| 7.0-8.9     | High      | < 24 hours     |
+| 4.0-6.9     | Medium    | < 1 week       |
+| 0.1-3.9     | Low       | Next patch cycle |
+| 0.0         | None/Info | Informational  |
+
+
+## Common Incident Response Steps (NIST SP 800-61)
+
+1. **Preparation**: Establish IR capability, tools, procedures.
+2. **Detection & Analysis**: Monitor alerts, validate incidents, determine scope.
+3. **Containment**: Short-term (isolate) and long-term (patch/rebuild).
+4. **Eradication**: Remove malware, close attack vectors, reset credentials.
+5. **Recovery**: Restore systems, verify integrity, monitor for recurrence.
+6. **Lessons Learned**: Post-incident review, update procedures, improve defenses.
+
+
+## Common Log Sources for SOC
+
+| Source           | Key Events                                  |
+|------------------|---------------------------------------------|
+| Firewall         | Block/allow, geo-anomalies, port scans     |
+| IDS/IPS          | Signature matches, anomaly alerts           |
+| SIEM             | Correlated events, threshold alerts         |
+| Endpoint (EDR)   | Process execution, file changes, registry   |
+| DNS              | Query logs, tunneling indicators            |
+| Active Directory | Login failures, account changes, Group Policy|
+| Email Gateway    | Phishing attempts, attachment blocks        |
+| WAF              | SQLi, XSS, directory traversal attempts     |

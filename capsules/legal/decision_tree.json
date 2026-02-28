@@ -1,0 +1,114 @@
+{
+    "name": "Contract Review Decision Tree",
+    "version": "1.0.0",
+    "root": "start",
+    "nodes": [
+        {
+            "id": "start",
+            "label": "Identify Contract Type",
+            "question": "What type of agreement is this (NDA, SaaS, employment, service)?"
+        },
+        {
+            "id": "parties_check",
+            "label": "Verify Parties & Authority",
+            "question": "Are all parties clearly identified? Do signatories have authority to bind?"
+        },
+        {
+            "id": "jurisdiction_check",
+            "label": "Determine Governing Law",
+            "question": "Which jurisdiction's law governs? Is there a choice-of-law clause?"
+        },
+        {
+            "id": "key_terms",
+            "label": "Analyze Key Terms",
+            "question": "Review core obligations, consideration, scope, and duration."
+        },
+        {
+            "id": "risk_clauses",
+            "label": "Identify High-Risk Clauses",
+            "question": "Check indemnification, limitation of liability, termination, non-compete, IP assignment."
+        },
+        {
+            "id": "confidentiality",
+            "label": "Review Confidentiality Provisions",
+            "question": "What information is covered? Duration of obligations? Exceptions?"
+        },
+        {
+            "id": "remedies",
+            "label": "Assess Remedies & Dispute Resolution",
+            "question": "What remedies are available? Arbitration vs litigation? Venue?"
+        },
+        {
+            "id": "compliance_check",
+            "label": "Check Regulatory Compliance",
+            "question": "Does the agreement comply with applicable laws (data protection, competition)?"
+        },
+        {
+            "id": "pass",
+            "label": "Contract Review Complete ✅",
+            "question": ""
+        },
+        {
+            "id": "flag_issues",
+            "label": "Issues Identified ⚠️ — Legal Review Needed",
+            "question": "Flag problematic clauses for attorney review."
+        }
+    ],
+    "edges": [
+        {
+            "from": "start",
+            "to": "parties_check",
+            "condition": "Contract type identified"
+        },
+        {
+            "from": "parties_check",
+            "to": "jurisdiction_check",
+            "condition": "Parties verified"
+        },
+        {
+            "from": "parties_check",
+            "to": "flag_issues",
+            "condition": "Authority unclear"
+        },
+        {
+            "from": "jurisdiction_check",
+            "to": "key_terms",
+            "condition": "Jurisdiction determined"
+        },
+        {
+            "from": "key_terms",
+            "to": "risk_clauses",
+            "condition": "Terms analyzed"
+        },
+        {
+            "from": "risk_clauses",
+            "to": "confidentiality",
+            "condition": "Risk clauses reviewed"
+        },
+        {
+            "from": "risk_clauses",
+            "to": "flag_issues",
+            "condition": "High-risk clauses found"
+        },
+        {
+            "from": "confidentiality",
+            "to": "remedies",
+            "condition": "Confidentiality adequate"
+        },
+        {
+            "from": "remedies",
+            "to": "compliance_check",
+            "condition": "Remedies assessed"
+        },
+        {
+            "from": "compliance_check",
+            "to": "pass",
+            "condition": "No compliance issues"
+        },
+        {
+            "from": "compliance_check",
+            "to": "flag_issues",
+            "condition": "Compliance concerns found"
+        }
+    ]
+}

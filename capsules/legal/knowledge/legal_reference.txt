@@ -1,0 +1,117 @@
+# Legal Knowledge Base
+# =====================
+# Contract law principles, NDA components, clause analysis guidelines
+
+## Key Components of a Valid Contract
+
+1. **Offer**: A clear proposal made by one party to another.
+2. **Acceptance**: Unequivocal agreement to all terms of the offer.
+3. **Consideration**: Something of value exchanged between parties.
+4. **Capacity**: All parties must have legal capacity to contract.
+5. **Legality**: The contract's purpose must be lawful.
+6. **Mutual Assent (Meeting of the Minds)**: Both parties must understand and agree to the essential terms.
+
+
+## Non-Disclosure Agreement (NDA) — Essential Elements
+
+### Definition of Confidential Information
+- Should be clearly defined and specific
+- Common approaches: marked/designated information, or broad categorical definition
+- Standard exceptions: publicly known, independently developed, received from third party, required by law
+
+### Obligations of Receiving Party
+- Non-disclosure: Do not reveal to unauthorized parties
+- Non-use: Use only for the stated purpose
+- Standard of care: Usually "reasonable measures" or "same care as own confidential info"
+- Need-to-know: Limit access to those who require it
+
+### Duration
+- Obligation period: Typically 2-5 years from disclosure
+- Perpetual NDAs: Common for trade secrets, unusual for general business info
+- Survival clause: Obligations that continue after agreement termination
+
+### Mutual vs Unilateral
+- Mutual NDA: Both parties share and protect information (common in partnerships/negotiations)
+- Unilateral NDA: One party discloses, the other protects (common in employer/employee)
+
+
+## High-Risk Contract Clauses to Flag
+
+### Indemnification
+- **One-sided indemnification**: Only one party bears risk — flag as unfair
+- **Uncapped indemnification**: No limit on liability — high risk for indemnifying party
+- **Best practice**: Mutual indemnification with carve-outs and caps
+
+### Limitation of Liability
+- **Cap amount**: Should be reasonable (common: 12 months of fees paid)
+- **Exclusions**: Usually carves out willful misconduct, IP infringement, confidentiality breach
+- **Consequential damages waiver**: Standard but review scope carefully
+
+### Termination
+- **Termination for convenience**: Either party can exit with notice (30-90 days typical)
+- **Termination for cause**: Requires material breach and cure period (30 days typical)
+- **Automatic renewal**: Flag if there's no exit window
+
+### Non-Compete / Non-Solicitation
+- **Geographic scope**: Must be reasonable (varies by jurisdiction)
+- **Duration**: Generally 1-2 years; some jurisdictions limit to 1 year
+- **California**: Non-competes generally unenforceable (Cal. Bus. & Prof. Code § 16600)
+- **New York**: Enforced if reasonable in scope, geography, and duration
+
+### Intellectual Property Assignment
+- **Work-for-hire**: Created IP belongs to the hiring party
+- **Assignment clause**: Transfers ownership of created IP
+- **Pre-existing IP**: Should be explicitly excluded from assignment
+- **Future inventions**: Broad future invention clauses may be unenforceable in some states
+
+
+## Jurisdiction-Specific Notes
+
+### United States
+- Contract law is primarily state law (not federal)
+- UCC Article 2 governs sale of goods
+- Common law governs services contracts
+- Choice-of-law clauses generally enforceable
+- Delaware: Preferred for corporate agreements (Court of Chancery expertise)
+- New York: Common for financial/commercial contracts
+- California: Strong consumer protections, non-compete restrictions
+
+### European Union
+- GDPR applies to all contracts involving EU personal data
+- Consumer contracts subject to EU Consumer Rights Directive
+- Rome I Regulation governs choice of law in contractual obligations
+- Unfair Terms Directive may override agreed terms in B2C contracts
+
+### India
+- Indian Contract Act, 1872 governs general contracts
+- Stamp duty varies by state and contract value
+- Arbitration governed by Arbitration and Conciliation Act, 1996
+- Non-competes during employment: generally unenforceable (Section 27, ICA)
+- Non-competes post-employment: enforceable only if reasonable
+
+### Cross-Border Considerations
+- Identify which country's courts have jurisdiction
+- Consider enforcement of judgments across borders
+- Include dispute resolution mechanism (arbitration preferred for cross-border)
+- ICC or SIAC arbitration commonly used for international commercial disputes
+
+
+## Contract Review Checklist
+
+| Category              | Check Item                              | Risk Level |
+|-----------------------|-----------------------------------------|------------|
+| Parties               | All parties identified and authorized   | High       |
+| Governing Law         | Jurisdiction specified                  | High       |
+| Term & Renewal        | Start/end dates, renewal mechanism      | Medium     |
+| Confidentiality       | Scope, duration, exceptions defined     | High       |
+| IP Rights             | Ownership, assignment, pre-existing IP  | High       |
+| Indemnification       | Mutual or one-sided, cap specified      | High       |
+| Liability Limitation  | Cap amount, exclusions listed           | High       |
+| Termination           | For convenience and cause, cure period  | Medium     |
+| Non-Compete           | Scope, geography, duration, jurisdiction| High       |
+| Dispute Resolution    | Arbitration vs litigation, venue        | Medium     |
+| Data Protection       | GDPR/privacy compliance if applicable   | High       |
+| Force Majeure         | Events covered, consequences specified  | Medium     |
+| Assignment            | Consent required for assignment?        | Medium     |
+| Severability          | Invalid clauses don't void contract     | Low        |
+| Entire Agreement      | Supersedes prior agreements             | Low        |

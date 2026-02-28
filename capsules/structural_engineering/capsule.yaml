@@ -1,0 +1,120 @@
+# Structural Engineering DNA Capsule
+# ===================================
+# Expert: Senior Structural Engineer
+# Standards: AISC 360, IS 456, IS 800, Eurocode
+
+name: "Structural Engineering Expert"
+version: "1.0.0"
+domain_id: "structural_engineering"
+description: "SME capsule for structural analysis, design verification, and code compliance checks covering steel (AISC/IS 800), concrete (IS 456/ACI 318), and general structural engineering principles."
+
+expert_persona: |
+  You are a senior structural engineer with 25 years of experience in steel and reinforced concrete design.
+  You have deep expertise in:
+  - Load analysis (dead, live, wind, seismic)
+  - Beam, column, slab, and foundation design
+  - AISC 360, IS 456, IS 800, ACI 318, and Eurocode compliance
+  - Structural failure analysis and safety assessment
+  
+  You ALWAYS cite specific code clauses (e.g., "per AISC 360-22, Section F2.1").
+  You express loads in kN, stresses in MPa, and dimensions in mm unless asked otherwise.
+  You flag safety-critical issues with ⚠️ warnings.
+  When uncertain, you recommend additional analysis or third-party review.
+
+triggers:
+  keywords:
+    - beam
+    - column
+    - slab
+    - foundation
+    - rebar
+    - reinforcement
+    - load
+    - tensile
+    - compressive
+    - shear
+    - bending
+    - moment
+    - deflection
+    - structural
+    - steel design
+    - concrete
+    - AISC
+    - IS 456
+    - IS 800
+    - ACI 318
+    - Eurocode
+    - buckling
+    - bracing
+    - seismic
+    - wind load
+    - dead load
+    - live load
+    - footing
+    - pile
+    - truss
+    - weld
+  regex_patterns:
+    - "\\d+\\s*(kN|MPa|psi|kPa|ksi)"
+    - "IS[- ]?456"
+    - "IS[- ]?800"
+    - "AISC\\s*\\d+"
+    - "ACI\\s*318"
+    - "(beam|column|slab)\\s*(design|check|analysis)"
+    - "load\\s*(calculation|analysis|combination)"
+  min_keyword_hits: 2
+  seed_queries:
+    - "Check if this steel beam can support 500 kN load"
+    - "Design a reinforced concrete column for this load combination"
+    - "What is the maximum deflection allowed for a 6m span beam?"
+    - "Calculate the moment capacity of a W24x84 steel section"
+    - "Is this foundation design adequate for 3-story building?"
+    - "Check AISC compliance for this connection detail"
+    - "What is the minimum reinforcement ratio per IS 456?"
+    - "Analyze wind load on this 20m tall structure"
+    - "Calculate the shear capacity of this concrete beam"
+    - "What size column is needed for 1500 kN axial load?"
+    - "Verify seismic design for Zone IV per IS 1893"
+    - "Check punching shear in this flat slab"
+    - "Design a cantilever retaining wall for 4m height"
+    - "What is the effective length factor for a fixed-pinned column?"
+    - "Calculate the weld size needed for this steel connection"
+
+rag:
+  top_k_bm25: 20
+  top_k_dense: 20
+  top_k_reranked: 5
+  use_hyde: true
+  chunk_size: 512
+  chunk_overlap: 64
+  embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+
+guardrails:
+  min_confidence: 0.55
+  require_citations: true
+  hallucination_threshold: 0.35
+  domain_validation_rules:
+    - rule: "units_check"
+      pattern: "\\d+\\s*(kN|MPa|mm|m|kPa|ksi|psi)"
+      message: "Ensure all values have proper engineering units."
+    - rule: "safety_factor"
+      pattern: "factor\\s*of\\s*safety|FOS|safety\\s*factor"
+      message: "Safety factor should be mentioned for critical designs."
+  forbidden_phrases:
+    - "I think it might be"
+    - "probably safe"
+    - "should be fine"
+    - "approximately okay"
+
+knowledge_dir: "knowledge"
+decision_tree_path: "decision_tree.json"
+
+sources_of_truth:
+  - "AISC 360-22 (Specification for Structural Steel Buildings)"
+  - "IS 456:2000 (Plain and Reinforced Concrete)"
+  - "IS 800:2007 (General Construction in Steel)"
+  - "ACI 318-19 (Building Code for Structural Concrete)"
+  - "IS 1893:2016 (Criteria for Earthquake Resistant Design)"
+  - "ASCE 7-22 (Minimum Design Loads)"
+
+fallback_message: "I cannot verify this structural analysis with sufficient confidence. Please consult a certified Structural Engineer for safety-critical decisions."

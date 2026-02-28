@@ -1,0 +1,96 @@
+# Structural Engineering Knowledge Base
+# ========================================
+# Excerpts from key standards and design principles
+
+## AISC 360-22 Key Provisions
+
+### Chapter F — Design of Members for Flexure
+The nominal flexural strength Mn shall be the lower value obtained from the limit states of yielding (plastic moment) and lateral-torsional buckling.
+
+For compact sections bent about their major axis:
+- Yielding: Mn = Mp = Fy × Zx
+- Where Fy = specified minimum yield stress, Zx = plastic section modulus
+
+### Chapter E — Design of Members for Compression
+The nominal compressive strength Pn shall be determined based on the limit state of flexural buckling:
+- For KL/r ≤ 4.71√(E/Fy): Pn = [0.658^(Fy/Fe)] × Fy × Ag
+- For KL/r > 4.71√(E/Fy): Pn = 0.877 × Fe × Ag
+- Where Fe = π²E/(KL/r)², K = effective length factor, r = radius of gyration
+
+### Chapter J — Design of Connections
+Bolt shear strength: Rn = Fn × Ab
+- Where Fn = nominal shear stress, Ab = nominal bolt area
+- For A325 bolts: Fn = 457 MPa (threads excluded), 372 MPa (threads included)
+
+
+## IS 456:2000 Key Provisions
+
+### Clause 26.5.1 — Minimum Reinforcement in Beams
+The minimum area of tension reinforcement shall not be less than:
+As,min = (0.85 × b × d) / fy
+Where b = breadth, d = effective depth, fy = characteristic strength of steel
+
+### Clause 40.1 — Shear Strength of Concrete
+Design shear strength τc depends on percentage of longitudinal tension reinforcement and concrete grade.
+For M20 concrete: τc ranges from 0.36 MPa (0.25% steel) to 0.80 MPa (3% steel)
+
+### Clause 23.2 — Deflection Limits
+Basic L/d ratios for serviceability:
+- Cantilever: 7
+- Simply supported: 20
+- Continuous: 26
+
+
+## IS 800:2007 Key Provisions
+
+### Clause 7.1 — Design Strength Due to Yielding
+Td = Ag × fy / γm0
+Where Ag = gross area, fy = yield stress, γm0 = 1.10 (partial safety factor)
+
+### Clause 7.3 — Design Strength Due to Block Shear
+Tdb = [Avg × fy / (√3 × γm0) + 0.9 × Atn × fu / γm1]
+or [0.9 × Avn × fu / (√3 × γm1) + Atg × fy / γm0]  — whichever is smaller
+
+
+## Common Load Combinations (IS 875)
+
+### Ultimate Limit State
+1. 1.5 × (DL + LL)
+2. 1.2 × (DL + LL + WL)
+3. 1.5 × (DL + WL)
+4. 0.9 × DL + 1.5 × WL (for overturning)
+
+### Seismic Combinations (IS 1893)
+1. 1.5 × (DL + EQ)
+2. 1.2 × (DL + LL + EQ)
+3. 0.9 × DL + 1.5 × EQ
+
+Where DL = Dead Load, LL = Live/Imposed Load, WL = Wind Load, EQ = Earthquake Load
+
+
+## Material Properties Reference
+
+| Material     | Grade  | Yield (MPa) | Ultimate (MPa) | Elastic Modulus (GPa) |
+|-------------|--------|--------------|-----------------|----------------------|
+| Steel       | Fe250  | 250          | 410             | 200                  |
+| Steel       | Fe415  | 415          | 485             | 200                  |
+| Steel       | Fe500  | 500          | 545             | 200                  |
+| Concrete    | M20    | -            | 20 (fck)        | 22.36                |
+| Concrete    | M25    | -            | 25 (fck)        | 25.00                |
+| Concrete    | M30    | -            | 30 (fck)        | 27.39                |
+| Steel (US)  | A992   | 345          | 450             | 200                  |
+
+
+## Safe Bearing Capacity of Soils
+
+| Soil Type            | SBC (kN/m²)  |
+|----------------------|-------------|
+| Soft clay            | 50-100      |
+| Medium clay          | 100-150     |
+| Stiff clay           | 150-300     |
+| Loose sand           | 100-150     |
+| Medium dense sand    | 150-300     |
+| Dense sand           | 300-500     |
+| Gravel               | 300-600     |
+| Soft rock            | 450-750     |
+| Hard rock            | > 3000      |
