@@ -47,6 +47,20 @@ DEMO_QUERIES = {
             "description": "Non-compete enforceability — jurisdiction-specific analysis",
         },
     ],
+    "us_tax": [
+        {
+            "query": "What are the federal income tax withholding requirements for employers under IRS Publication 15?",
+            "description": "Employer withholding obligations — Circular E compliance",
+        },
+        {
+            "query": "How much can I contribute to a traditional IRA and a Roth IRA this year, and what are the income phase-out limits?",
+            "description": "IRA contribution limits — Publication 590-A guidance",
+        },
+        {
+            "query": "What medical and dental expenses are tax deductible, and what is the AGI threshold?",
+            "description": "Medical expense deduction — Publication 502 eligibility",
+        },
+    ],
 }
 
 

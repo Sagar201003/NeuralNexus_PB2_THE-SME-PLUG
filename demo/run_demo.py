@@ -127,6 +127,10 @@ def run_demo():
 
     for domain_id, capsule in ec.router._capsules.items():
         if capsule.knowledge_dir:
+            stats = vector_store.collection_stats(domain_id)
+            if stats["document_count"] > 0:
+                console.print(f"  ⏭️  {domain_id}: {stats['document_count']} chunks already indexed, skipping.")
+                continue
             summary = pipeline.ingest_capsule(
                 domain_id=domain_id,
                 knowledge_dir=capsule.knowledge_dir,
@@ -154,13 +158,14 @@ def run_demo():
     console.print()
     console.print(Panel(
         "[bold green]✅ Demo complete![/]\n\n"
-        "Three domains queried with automatic domain detection,\n"
+        "Four domains queried with automatic domain detection,\n"
         "advanced RAG retrieval, decision tree reasoning,\n"
         "and source-of-truth citation enforcement.\n\n"
         "[dim]Available capsules:[/]\n"
         "  🏗️ Structural Engineering\n"
         "  🛡️ Cybersecurity SOC Analyst\n"
-        "  ⚖️ Legal Contract Analyst\n\n"
+        "  ⚖️ Legal Contract Analyst\n"
+        "  💰 US Tax Expert\n\n"
         "[dim]Run the API server: python main.py api[/]",
         title="🏆 SME-PLUG Demo Summary",
         border_style="green",

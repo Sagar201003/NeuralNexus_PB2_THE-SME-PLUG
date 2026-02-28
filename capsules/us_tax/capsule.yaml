@@ -1,0 +1,139 @@
+# US Federal Tax DNA Capsule
+# ========================================
+# Expert: Senior Tax CPA / IRS Enrolled Agent
+# Standards: Internal Revenue Code, IRS Publications, Treasury Regulations
+
+name: "US Tax Expert"
+version: "1.0.0"
+domain_id: "us_tax"
+description: "SME capsule for US federal tax guidance — individual filing, employer obligations, deductions, credits, retirement accounts, and IRS compliance based on official IRS publications."
+
+expert_persona: |
+  You are a senior Certified Public Accountant (CPA) and IRS Enrolled Agent with 20 years
+  of experience in US federal taxation. Your specializations include:
+  - Individual income tax filing (Forms 1040, W-2, 1099 series)
+  - Employer tax obligations (withholding, FICA, FUTA — Publications 15, 15-A, 15-B, 15-T)
+  - Deductions and credits (standard, itemized, child tax credit, EITC)
+  - Retirement accounts (IRA, 401(k), 403(b), Roth conversions — Publications 590-A/B, 571)
+  - Small business taxation (sole proprietors, partnerships, S-corps — Publications 334, 541, 542)
+  - Capital gains, investment income, and asset basis (Publications 550, 551, 544)
+  - Tax withholding and estimated tax (Publication 505)
+  - Filing status, dependents, and exemptions (Publication 501)
+  - Foreign income and tax credits (Publications 54, 514, 519)
+  - Tax-exempt organizations (Publication 557)
+  
+  You ALWAYS cite the specific IRS Publication number and section when providing guidance.
+  You reference the applicable tax year for any figures (brackets, limits, thresholds).
+  You clearly distinguish between tax law requirements and optional planning strategies.
+  When uncertain, you recommend consulting a licensed tax professional.
+  You NEVER guarantee specific refund amounts or audit outcomes.
+
+triggers:
+  keywords:
+    - tax
+    - IRS
+    - income tax
+    - federal tax
+    - withholding
+    - W-2
+    - W-4
+    - "1099"
+    - "1040"
+    - deduction
+    - exemption
+    - filing status
+    - tax bracket
+    - tax credit
+    - refund
+    - FICA
+    - Social Security tax
+    - Medicare tax
+    - FUTA
+    - estimated tax
+    - capital gains
+    - depreciation
+    - IRA
+    - 401k
+    - Roth
+    - standard deduction
+    - itemized deduction
+    - dependent
+    - earned income credit
+    - child tax credit
+    - tax-exempt
+    - excise tax
+    - installment sale
+    - business expense
+    - home office deduction
+    - charitable contribution
+    - medical expense deduction
+  regex_patterns:
+    - "(Publication|Pub\\.?)\\s*\\d+"
+    - "(Form|Schedule)\\s*(\\d{3,4}[A-Z]?(-[A-Z]+)?)"
+    - "(tax\\s*year|TY)\\s*\\d{4}"
+    - "(Section|§|IRC)\\s*\\d+"
+    - "\\$[\\d,]+(\\.\\d{2})?"
+    - "(W-[2-9]|1040|1099|990|941|940)"
+  min_keyword_hits: 2
+  seed_queries:
+    - "What are the federal income tax withholding requirements for employers?"
+    - "How much can I contribute to a traditional IRA this year?"
+    - "What medical expenses are tax deductible?"
+    - "How do I calculate estimated tax payments?"
+    - "What is the standard deduction for a married couple filing jointly?"
+    - "How are long-term capital gains taxed?"
+    - "What are the employer FICA tax rates and wage base limits?"
+    - "Can I deduct home office expenses as a sole proprietor?"
+    - "What are the rules for Roth IRA conversions?"
+    - "How do I report tip income on my tax return?"
+    - "What charitable contribution limits apply to individual donors?"
+    - "How is depreciation calculated for rental property?"
+    - "What tax credits are available for child and dependent care?"
+    - "How do I determine my filing status after divorce?"
+    - "What are the tax implications of selling my primary residence?"
+
+rag:
+  top_k_bm25: 20
+  top_k_dense: 20
+  top_k_reranked: 5
+  use_hyde: true
+  chunk_size: 512
+  chunk_overlap: 64
+  embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+
+guardrails:
+  min_confidence: 0.55
+  require_citations: true
+  hallucination_threshold: 0.35
+  domain_validation_rules:
+    - rule: "publication_reference"
+      pattern: "(Publication|Pub\\.?)\\s*\\d+"
+      message: "Tax guidance should reference specific IRS Publication numbers."
+    - rule: "tax_year_mention"
+      pattern: "(\\d{4}\\s*tax\\s*year|tax\\s*year\\s*\\d{4}|for\\s*\\d{4})"
+      message: "Tax figures and limits should specify the applicable tax year."
+    - rule: "not_tax_advice"
+      pattern: "(not tax advice|consult.*tax professional|consult.*CPA|seek professional)"
+      message: "Response should include disclaimer that this is informational, not personalized tax advice."
+  forbidden_phrases:
+    - "guaranteed refund"
+    - "you will definitely owe"
+    - "the IRS won't notice"
+    - "no chance of audit"
+    - "always deductible"
+    - "never taxable"
+
+knowledge_dir: "knowledge"
+decision_tree_path: "decision_tree.json"
+
+sources_of_truth:
+  - "Internal Revenue Code (IRC)"
+  - "IRS Publication 15 (Circular E) — Employer's Tax Guide"
+  - "IRS Publication 17 — Your Federal Income Tax"
+  - "IRS Publication 334 — Tax Guide for Small Business"
+  - "IRS Publication 501 — Dependents, Standard Deduction, Filing Information"
+  - "IRS Publication 505 — Tax Withholding and Estimated Tax"
+  - "IRS Publication 590-A/B — IRA Contributions and Distributions"
+  - "Treasury Regulations"
+
+fallback_message: "I cannot provide sufficiently grounded tax guidance for this query. Please consult a licensed CPA or Enrolled Agent for personalized tax advice."

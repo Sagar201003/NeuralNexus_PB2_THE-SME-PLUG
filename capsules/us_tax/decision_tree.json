@@ -1,0 +1,99 @@
+{
+    "name": "US Tax Question Reasoning Tree",
+    "version": "1.0.0",
+    "root": "start",
+    "nodes": [
+        {
+            "id": "start",
+            "label": "Identify Tax Area",
+            "question": "What area of US federal tax does this question concern (income, employment, deductions, credits, retirement, business, capital gains)?"
+        },
+        {
+            "id": "filing_status",
+            "label": "Determine Filing Status & Tax Year",
+            "question": "What is the taxpayer's filing status and which tax year applies?"
+        },
+        {
+            "id": "eligibility",
+            "label": "Check Eligibility & Thresholds",
+            "question": "Does the taxpayer meet income limits, age requirements, or other eligibility criteria?"
+        },
+        {
+            "id": "calculation",
+            "label": "Calculate Tax Impact",
+            "question": "What are the applicable rates, limits, phase-outs, and amounts?"
+        },
+        {
+            "id": "compliance",
+            "label": "Verify Compliance Requirements",
+            "question": "What forms must be filed, what are the deadlines, and what records must be kept?"
+        },
+        {
+            "id": "cite_sources",
+            "label": "Cite IRS Sources",
+            "question": "Which IRS Publications, IRC sections, or Treasury Regulations support this guidance?"
+        },
+        {
+            "id": "professional_review",
+            "label": "Recommend Professional Review",
+            "question": "Is this situation complex enough to warrant referral to a licensed CPA or Enrolled Agent?"
+        },
+        {
+            "id": "employer_obligations",
+            "label": "Employer Tax Obligations",
+            "question": "What are the employer withholding, deposit, and reporting requirements?"
+        },
+        {
+            "id": "individual_planning",
+            "label": "Individual Tax Planning",
+            "question": "What strategies (timing, elections, contributions) could optimize the tax outcome?"
+        }
+    ],
+    "edges": [
+        {
+            "from": "start",
+            "to": "filing_status",
+            "condition": "Tax area identified"
+        },
+        {
+            "from": "filing_status",
+            "to": "eligibility",
+            "condition": "Filing status and tax year determined"
+        },
+        {
+            "from": "eligibility",
+            "to": "employer_obligations",
+            "condition": "Employment/employer tax question"
+        },
+        {
+            "from": "eligibility",
+            "to": "calculation",
+            "condition": "Individual/deduction/credit question"
+        },
+        {
+            "from": "employer_obligations",
+            "to": "compliance",
+            "condition": "Obligations identified"
+        },
+        {
+            "from": "calculation",
+            "to": "individual_planning",
+            "condition": "Tax impact calculated"
+        },
+        {
+            "from": "individual_planning",
+            "to": "compliance",
+            "condition": "Planning options reviewed"
+        },
+        {
+            "from": "compliance",
+            "to": "cite_sources",
+            "condition": "Compliance requirements verified"
+        },
+        {
+            "from": "cite_sources",
+            "to": "professional_review",
+            "condition": "Sources cited"
+        }
+    ]
+}
