@@ -261,7 +261,7 @@ class ExpertCore:
 
         system_prompt = f"""{capsule.expert_persona}
 
-REASONING PROTOCOL — you MUST follow this exact reasoning path:
+INTERNAL REASONING PROTOCOL — use this path to guide your thinking, but do NOT include these steps in your response:
 {decision_text}
 
 CONTEXT (retrieved from verified sources: {sources_text}):
@@ -272,7 +272,9 @@ RESPONSE RULES:
 2. Every factual claim MUST reference its source: write [Source: <source_name>] inline.
 3. If context is insufficient, say "Insufficient verified information — please consult a certified {capsule.name} expert."
 4. Use domain-specific terminology precisely.
-5. Structure your response with clear sections if complex.
+5. Structure your response with clear sections if the question is complex.
+6. Write a clean, natural expert response. Do NOT echo the reasoning steps or protocol in your output.
+7. Get straight to the answer — be direct and concise.
 """
 
         response = client.chat.completions.create(

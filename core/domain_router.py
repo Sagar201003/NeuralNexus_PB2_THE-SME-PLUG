@@ -17,10 +17,14 @@ import json
 from dataclasses import dataclass, field
 from typing import Optional
 
+import torch
 import numpy as np
 from loguru import logger
 from groq import Groq
 from sentence_transformers import SentenceTransformer
+
+# Auto-detect GPU
+_DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 from core.capsule_loader import CapsuleLoader, CapsuleConfig
 
@@ -91,9 +95,10 @@ class DomainRouter:
         # Pre-compute seed embeddings (L3) — only if seed queries exist
         all_have_seeds = any(cfg.triggers.seed_queries for cfg in self._capsules.values())
         if all_have_seeds:
-            logger.info("Computing seed query embeddings for L3 detection...")
+            logger.info(f"Computing seed query embeddings for L3 detection (device={_DEVICE})...")
             self._embedder = SentenceTransformer(
-                next(iter(self._capsules.values())).rag.embedding_model
+                next(iter(self._capsules.values())).rag.embedding_model,
+                device=_DEVICE,
             )
             for domain_id, cfg in self._capsules.items():
                 if cfg.triggers.seed_queries:

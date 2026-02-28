@@ -158,14 +158,15 @@ def run_demo():
     console.print()
     console.print(Panel(
         "[bold green]✅ Demo complete![/]\n\n"
-        "Four domains queried with automatic domain detection,\n"
+        "Five domains queried with automatic domain detection,\n"
         "advanced RAG retrieval, decision tree reasoning,\n"
         "and source-of-truth citation enforcement.\n\n"
         "[dim]Available capsules:[/]\n"
         "  🏗️ Structural Engineering\n"
         "  🛡️ Cybersecurity SOC Analyst\n"
         "  ⚖️ Legal Contract Analyst\n"
-        "  💰 US Tax Expert\n\n"
+        "  💰 US Tax Expert\n"
+        "  🏏 Cricket Expert\n\n"
         "[dim]Run the API server: python main.py api[/]",
         title="🏆 SME-PLUG Demo Summary",
         border_style="green",

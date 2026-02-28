@@ -1,0 +1,89 @@
+{
+    "name": "Cricket Query Reasoning Tree",
+    "version": "1.0.0",
+    "root": "start",
+    "nodes": [
+        {
+            "id": "start",
+            "label": "Identify Cricket Query Type",
+            "question": "What type of cricket question is this (match result, player stats, records, strategy, tournament)?"
+        },
+        {
+            "id": "format_scope",
+            "label": "Determine Format & Scope",
+            "question": "Which format (Test, ODI, T20, IPL) and time period does this query cover?"
+        },
+        {
+            "id": "match_search",
+            "label": "Search Match Records",
+            "question": "Find relevant matches from the knowledge base matching teams, players, venue, or date."
+        },
+        {
+            "id": "stat_compute",
+            "label": "Compute Statistics",
+            "question": "Calculate aggregated stats (runs, wickets, averages, strike rates) from matched records."
+        },
+        {
+            "id": "context_analyze",
+            "label": "Analyze Context & Conditions",
+            "question": "Consider venue, pitch, toss, opposition strength, and match situation."
+        },
+        {
+            "id": "compare",
+            "label": "Compare & Rank",
+            "question": "Compare performances, head-to-head records, or rank players/teams."
+        },
+        {
+            "id": "cite_data",
+            "label": "Cite Match Data",
+            "question": "Reference specific match IDs, dates, venues, and scorecards."
+        },
+        {
+            "id": "insight",
+            "label": "Provide Expert Insight",
+            "question": "Add analytical commentary on patterns, trends, and strategic implications."
+        }
+    ],
+    "edges": [
+        {
+            "from": "start",
+            "to": "format_scope",
+            "condition": "Query type identified"
+        },
+        {
+            "from": "format_scope",
+            "to": "match_search",
+            "condition": "Format and scope determined"
+        },
+        {
+            "from": "match_search",
+            "to": "stat_compute",
+            "condition": "Player/team stats question"
+        },
+        {
+            "from": "match_search",
+            "to": "context_analyze",
+            "condition": "Match analysis question"
+        },
+        {
+            "from": "stat_compute",
+            "to": "compare",
+            "condition": "Comparison or ranking needed"
+        },
+        {
+            "from": "context_analyze",
+            "to": "compare",
+            "condition": "Context analyzed"
+        },
+        {
+            "from": "compare",
+            "to": "cite_data",
+            "condition": "Analysis complete"
+        },
+        {
+            "from": "cite_data",
+            "to": "insight",
+            "condition": "Data cited"
+        }
+    ]
+}

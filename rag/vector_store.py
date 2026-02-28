@@ -10,10 +10,14 @@ import os
 from pathlib import Path
 from typing import Optional
 
+import torch
 import chromadb
 from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
 from loguru import logger
+
+# Auto-detect GPU
+_DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 class VectorStoreManager:
@@ -28,15 +32,15 @@ class VectorStoreManager:
         self._client = chromadb.PersistentClient(path=self.persist_dir)
         self._embedder: SentenceTransformer | None = None
         self._current_model_name: str | None = None
-        logger.info(f"VectorStoreManager initialized | persist_dir={self.persist_dir}")
+        logger.info(f"VectorStoreManager initialized | persist_dir={self.persist_dir} | device={_DEVICE}")
 
     # ── Embedder Management ───────────────────────────────────────────────────
 
     def _load_embedder(self, model_name: str = "sentence-transformers/all-MiniLM-L6-v2") -> SentenceTransformer:
-        """Lazy-load and cache the embedding model."""
+        """Lazy-load and cache the embedding model. Uses GPU if available."""
         if self._embedder is None or self._current_model_name != model_name:
-            logger.info(f"Loading embedding model: {model_name}")
-            self._embedder = SentenceTransformer(model_name)
+            logger.info(f"Loading embedding model: {model_name} (device={_DEVICE})")
+            self._embedder = SentenceTransformer(model_name, device=_DEVICE)
             self._current_model_name = model_name
         return self._embedder
 

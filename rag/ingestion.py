@@ -119,6 +119,9 @@ class FileParser:
         if suffix in (".html", ".htm"):
             return FileParser._parse_html(file_path)
 
+        if suffix == ".json":
+            return FileParser._parse_json(file_path)
+
         # Fallback: try as text
         try:
             return path.read_text(encoding="utf-8", errors="ignore")
@@ -163,6 +166,94 @@ class FileParser:
         except ImportError:
             logger.error("beautifulsoup4 not installed.")
             return ""
+
+    @staticmethod
+    def _parse_json(path: str) -> str:
+        """Convert structured JSON (e.g. cricket match data) into readable text."""
+        import json as _json
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = _json.load(f)
+        except Exception as e:
+            logger.warning(f"JSON parse error for {path}: {e}")
+            return ""
+
+        # Cricket match JSON (Cricsheet format)
+        if "info" in data and "innings" in data:
+            return FileParser._cricket_match_to_text(data, Path(path).stem)
+
+        # Generic JSON: flatten to key-value text
+        return _json.dumps(data, indent=2, ensure_ascii=False)
+
+    @staticmethod
+    def _cricket_match_to_text(data: dict, match_id: str) -> str:
+        """Convert a Cricsheet match JSON into a compact text summary for RAG."""
+        info = data.get("info", {})
+        lines = []
+
+        teams = info.get("teams", [])
+        lines.append(f"Match ID: {match_id}")
+        lines.append(f"Match: {' vs '.join(teams)}")
+        lines.append(f"Match Type: {info.get('match_type', 'Unknown')}")
+        lines.append(f"Gender: {info.get('gender', 'Unknown')}")
+
+        dates = info.get("dates", [])
+        if dates:
+            lines.append(f"Date: {dates[0]}" + (f" to {dates[-1]}" if len(dates) > 1 else ""))
+
+        lines.append(f"Venue: {info.get('venue', 'Unknown')}")
+        lines.append(f"City: {info.get('city', 'Unknown')}")
+        lines.append(f"Season: {info.get('season', 'Unknown')}")
+
+        event = info.get("event", {})
+        if event:
+            lines.append(f"Event: {event.get('name', '')}")
+            if "match_number" in event:
+                lines.append(f"Match Number: {event['match_number']}")
+
+        toss = info.get("toss", {})
+        if toss:
+            lines.append(f"Toss: {toss.get('winner', '?')} won and chose to {toss.get('decision', '?')}")
+
+        outcome = info.get("outcome", {})
+        if "winner" in outcome:
+            margin = outcome.get("by", {})
+            margin_str = ", ".join(f"{v} {k}" for k, v in margin.items()) if margin else ""
+            lines.append(f"Result: {outcome['winner']} won" + (f" by {margin_str}" if margin_str else ""))
+        elif "result" in outcome:
+            lines.append(f"Result: {outcome['result']}")
+
+        pom = info.get("player_of_match", [])
+        if pom:
+            lines.append(f"Player of the Match: {', '.join(pom)}")
+
+        # Players
+        players = info.get("players", {})
+        for team_name, roster in players.items():
+            lines.append(f"{team_name} squad: {', '.join(roster)}")
+
+        # Innings summaries
+        for i, inn in enumerate(data.get("innings", []), 1):
+            team = inn.get("team", f"Innings {i}")
+            overs = inn.get("overs", [])
+            total_runs = 0
+            total_wickets = 0
+            for over in overs:
+                for delivery in over.get("deliveries", []):
+                    runs = delivery.get("runs", {})
+                    total_runs += runs.get("total", 0)
+                    if "wickets" in delivery:
+                        total_wickets += len(delivery["wickets"])
+            overs_bowled = f"{overs[-1]['over']}.{len(overs[-1].get('deliveries', []))}" if overs else "0"
+            lines.append(f"Innings {i} — {team}: {total_runs}/{total_wickets} in {overs_bowled} overs")
+
+        # Officials
+        officials = info.get("officials", {})
+        umpires = officials.get("umpires", [])
+        if umpires:
+            lines.append(f"Umpires: {', '.join(umpires)}")
+
+        return "\n".join(lines)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -257,7 +348,7 @@ class DocumentIngestionPipeline:
         self.chunker = SemanticChunker(chunk_size, chunk_overlap)
 
         # Discover files
-        supported = {".txt", ".md", ".pdf", ".docx", ".html", ".htm", ".csv"}
+        supported = {".txt", ".md", ".pdf", ".docx", ".html", ".htm", ".csv", ".json"}
         files = [f for f in knowledge_path.rglob("*") if f.suffix.lower() in supported]
         logger.info(f"Ingesting {len(files)} files for domain '{domain_id}'")
 

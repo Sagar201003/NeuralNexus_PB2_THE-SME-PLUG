@@ -1,0 +1,133 @@
+# Cricket Expert DNA Capsule
+# ========================================
+# Expert: Senior Cricket Analyst / Commentator
+# Data: Cricsheet ball-by-ball match JSON records
+
+name: "Cricket Expert"
+version: "1.0.0"
+domain_id: "cricket"
+description: "SME capsule for cricket match analysis, player statistics, match history, and game strategy based on comprehensive ball-by-ball match data from international and domestic cricket."
+
+expert_persona: |
+  You are a senior cricket analyst and commentator with 20 years of experience
+  covering international and domestic cricket. Your specializations include:
+  - Match analysis across all formats (Test, ODI, T20I, IPL, and domestic leagues)
+  - Player performance evaluation (batting averages, strike rates, bowling economy, wicket stats)
+  - Historical match records, milestones, and head-to-head comparisons
+  - Strategic analysis (field placement, batting order, bowling changes, DLS method)
+  - Tournament analysis (IPL, World Cup, Ashes, bilateral series)
+  - Venue and conditions analysis (pitch behavior, weather impact, toss advantage)
+  
+  You cite specific match data including dates, venues, scorecards, and player of the match awards.
+  You reference match IDs when available for traceability.
+  You present statistics clearly with proper context (format, opposition strength, conditions).
+  When data is insufficient for a definitive answer, you state the limitation clearly.
+
+triggers:
+  keywords:
+    - cricket
+    - batsman
+    - batter
+    - bowler
+    - bowling
+    - batting
+    - wicket
+    - runs
+    - innings
+    - over
+    - Test match
+    - ODI
+    - T20
+    - T20I
+    - IPL
+    - World Cup
+    - Ashes
+    - century
+    - half-century
+    - duck
+    - hat-trick
+    - six
+    - four
+    - boundary
+    - LBW
+    - caught
+    - stumped
+    - run out
+    - no ball
+    - wide
+    - maiden over
+    - spin
+    - pace
+    - fast bowling
+    - DRS
+    - DLS
+    - powerplay
+    - fielding
+    - player of the match
+    - toss
+    - pitch
+    - Sachin
+    - Virat
+    - Kohli
+    - Dhoni
+    - Bradman
+  regex_patterns:
+    - "(Test|ODI|T20I?)\\s*(match|series|cricket)"
+    - "(IPL|PSL|BBL|CPL|BPL)\\s*(\\d{4})?"
+    - "\\d+/\\d+\\s*(in|after)\\s*\\d+(\\.\\d)?\\s*overs?"
+    - "(century|half.century|hat.trick|duck)"
+    - "(batting|bowling)\\s*(average|strike rate|economy)"
+    - "(World\\s*Cup|Ashes|Asia\\s*Cup)"
+  min_keyword_hits: 2
+  seed_queries:
+    - "Who won the India vs Australia Test match in Perth?"
+    - "What was Virat Kohli's performance in the 2016 IPL season?"
+    - "List all matches where a player scored a century at the MCG"
+    - "What is the head-to-head record between India and South Africa in Tests?"
+    - "Which bowler took the most wickets in the 2023 World Cup?"
+    - "Analyze the toss impact in Day-Night Test matches"
+    - "Who was the player of the match in the IPL final?"
+    - "What are the highest team totals in T20 internationals?"
+    - "How did Australia perform in the 2016/17 home season?"
+    - "Which player has the best bowling economy in powerplay overs?"
+    - "List all hat-tricks in ODI World Cup history"
+    - "What was the result of the Ashes series in England?"
+    - "How many centuries has Sachin Tendulkar scored in Test cricket?"
+    - "Which venues have the highest average first innings scores?"
+    - "What are the closest finishes in IPL history by runs?"
+
+rag:
+  top_k_bm25: 20
+  top_k_dense: 20
+  top_k_reranked: 5
+  use_hyde: true
+  chunk_size: 512
+  chunk_overlap: 64
+  embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+
+guardrails:
+  min_confidence: 0.55
+  require_citations: true
+  hallucination_threshold: 0.35
+  domain_validation_rules:
+    - rule: "match_reference"
+      pattern: "(Match ID|match.*\\d{4}|in \\d{4})"
+      message: "Cricket analysis should reference specific matches or seasons."
+    - rule: "format_mention"
+      pattern: "(Test|ODI|T20I?|IPL|First.Class)"
+      message: "Statistics should specify the cricket format."
+  forbidden_phrases:
+    - "definitely the best player ever"
+    - "guaranteed to win"
+    - "worst player in history"
+    - "100% accurate stats"
+
+knowledge_dir: "knowledge"
+decision_tree_path: "decision_tree.json"
+
+sources_of_truth:
+  - "Cricsheet Ball-by-Ball Match Data"
+  - "ICC Official Records"
+  - "ESPNcricinfo Statistics"
+
+fallback_message: "I cannot find sufficient match data to answer this query with confidence. The available data may not cover the specific match, player, or time period you're asking about."

@@ -61,6 +61,20 @@ DEMO_QUERIES = {
             "description": "Medical expense deduction — Publication 502 eligibility",
         },
     ],
+    "cricket": [
+        {
+            "query": "Who won the South Africa vs Australia Test match in Perth in the 2016/17 season and who was the player of the match?",
+            "description": "Match result lookup — Test match history with player awards",
+        },
+        {
+            "query": "What are the top scoring innings in T20 international matches at the MCG?",
+            "description": "Venue-specific T20I batting records",
+        },
+        {
+            "query": "Which bowler has taken the most wickets in IPL history and what is their bowling economy?",
+            "description": "IPL bowling statistics — career records analysis",
+        },
+    ],
 }
 
 
