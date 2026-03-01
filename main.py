@@ -64,14 +64,10 @@ def run_query(query: str, domain: str = None):
     ec.retriever.set_stores(vector_store, bm25_index)
     ec.bootstrap()
 
-    # Ingest capsule knowledge (skip if already ingested)
+    # Ingest capsule knowledge (incremental — only new files are processed)
     pipeline = DocumentIngestionPipeline(vector_store, bm25_index)
     for did, capsule in ec.router._capsules.items():
         if capsule.knowledge_dir:
-            stats = vector_store.collection_stats(did)
-            if stats["document_count"] > 0:
-                console.print(f"[dim]⏭️  {did}: {stats['document_count']} chunks already indexed, skipping.[/]")
-                continue
             pipeline.ingest_capsule(
                 domain_id=did,
                 knowledge_dir=capsule.knowledge_dir,

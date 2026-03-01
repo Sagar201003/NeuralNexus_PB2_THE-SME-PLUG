@@ -127,10 +127,6 @@ def run_demo():
 
     for domain_id, capsule in ec.router._capsules.items():
         if capsule.knowledge_dir:
-            stats = vector_store.collection_stats(domain_id)
-            if stats["document_count"] > 0:
-                console.print(f"  ⏭️  {domain_id}: {stats['document_count']} chunks already indexed, skipping.")
-                continue
             summary = pipeline.ingest_capsule(
                 domain_id=domain_id,
                 knowledge_dir=capsule.knowledge_dir,

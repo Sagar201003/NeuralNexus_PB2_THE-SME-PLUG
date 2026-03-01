@@ -16,6 +16,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from loguru import logger
 
 from api.routes import router, set_expert_core, set_vector_store
@@ -41,11 +43,10 @@ async def lifespan(app: FastAPI):
     # Bootstrap domain router (loads capsules, computes seed embeddings)
     expert_core.bootstrap()
 
-    # Ingest all capsule knowledge bases
+    # Ingest all capsule knowledge (incremental — only new files processed)
     pipeline = DocumentIngestionPipeline(vector_store, bm25_index)
     for domain_id, capsule in expert_core.router._capsules.items():
         if capsule.knowledge_dir:
-            logger.info(f"Ingesting knowledge for: {domain_id}")
             pipeline.ingest_capsule(
                 domain_id=domain_id,
                 knowledge_dir=capsule.knowledge_dir,
@@ -86,6 +87,15 @@ app.add_middleware(
 )
 
 app.include_router(router, prefix="", tags=["SME-PLUG"])
+
+# Serve UI
+ui_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "ui")
+app.mount("/ui", StaticFiles(directory=ui_dir), name="ui")
+
+
+@app.get("/", include_in_schema=False)
+async def serve_ui():
+    return FileResponse(os.path.join(ui_dir, "index.html"))
 
 
 if __name__ == "__main__":

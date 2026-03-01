@@ -337,23 +337,62 @@ class DocumentIngestionPipeline:
     ) -> dict:
         """
         Ingest all documents from a capsule's knowledge directory.
+        Supports incremental ingestion — only new/unseen files are processed.
 
-        Returns summary dict: {files_found, chunks_created, chunks_stored}
+        Returns summary dict: {files_found, files_new, chunks_created, chunks_stored}
         """
         knowledge_path = Path(knowledge_dir)
         if not knowledge_path.exists():
             logger.warning(f"Knowledge dir not found: {knowledge_dir}")
-            return {"files_found": 0, "chunks_created": 0, "chunks_stored": 0}
+            return {"files_found": 0, "files_new": 0, "chunks_created": 0, "chunks_stored": 0}
 
         self.chunker = SemanticChunker(chunk_size, chunk_overlap)
 
-        # Discover files
+        # Discover files (including extensionless PDFs)
         supported = {".txt", ".md", ".pdf", ".docx", ".html", ".htm", ".csv", ".json"}
-        files = [f for f in knowledge_path.rglob("*") if f.suffix.lower() in supported]
-        logger.info(f"Ingesting {len(files)} files for domain '{domain_id}'")
+        files = []
+        for f in knowledge_path.rglob("*"):
+            if f.is_dir():
+                continue
+            if f.suffix.lower() in supported:
+                files.append(f)
+            elif f.suffix == "":  # extensionless — check if it's a PDF by magic bytes
+                try:
+                    with open(f, "rb") as fh:
+                        header = fh.read(4)
+                    if header == b"%PDF":
+                        files.append(f)
+                except Exception:
+                    pass
+
+        logger.info(f"Found {len(files)} files for domain '{domain_id}'")
+
+        # ── Smart incremental ingestion: skip already-indexed files ────
+        already_indexed = set()
+        try:
+            collection = self.vector_store.get_or_create_collection(domain_id)
+            if collection.count() > 0:
+                # Sample existing source names from the collection
+                existing = collection.get(limit=collection.count(), include=["metadatas"])
+                for meta in existing.get("metadatas", []):
+                    src = meta.get("source", "")
+                    if src:
+                        already_indexed.add(src)
+        except Exception as e:
+            logger.warning(f"Could not check existing sources: {e}")
+
+        new_files = [f for f in files if f.name not in already_indexed]
+        skipped = len(files) - len(new_files)
+        if skipped > 0:
+            logger.info(f"⏭️  Skipping {skipped} already-indexed files for '{domain_id}'")
+        if not new_files:
+            logger.info(f"No new files to ingest for '{domain_id}'")
+            return {"files_found": len(files), "files_new": 0, "chunks_created": 0, "chunks_stored": 0}
+
+        logger.info(f"Ingesting {len(new_files)} NEW files for domain '{domain_id}'")
 
         all_chunks = []
-        for file_path in files:
+        for file_path in new_files:
             text = self.parser.parse(str(file_path))
             if not text.strip():
                 continue
@@ -362,8 +401,8 @@ class DocumentIngestionPipeline:
             logger.debug(f"  {file_path.name}: {len(chunks)} chunks")
 
         if not all_chunks:
-            logger.warning(f"No content extracted for domain '{domain_id}'")
-            return {"files_found": len(files), "chunks_created": 0, "chunks_stored": 0}
+            logger.warning(f"No content extracted from new files for domain '{domain_id}'")
+            return {"files_found": len(files), "files_new": len(new_files), "chunks_created": 0, "chunks_stored": 0}
 
         # Store in vector DB
         stored = self.vector_store.add_documents(
@@ -372,11 +411,12 @@ class DocumentIngestionPipeline:
             embedding_model=embedding_model,
         )
 
-        # Build BM25 index
+        # Rebuild BM25 index (includes all chunks — existing + new)
         self.bm25.build(domain_id, all_chunks)
 
         summary = {
             "files_found": len(files),
+            "files_new": len(new_files),
             "chunks_created": len(all_chunks),
             "chunks_stored": stored,
         }

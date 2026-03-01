@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SME-PLUG — Expert Chat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary: #0d0d0d;
+      --bg-secondary: #171717;
+      --bg-tertiary: #1e1e1e;
+      --bg-hover: #2a2a2a;
+      --bg-input: #2f2f2f;
+      --text-primary: #ececec;
+      --text-secondary: #a0a0a0;
+      --text-muted: #6b6b6b;
+      --accent: #6c9cfc;
+      --accent-dim: #3a5a9c;
+      --border: #2e2e2e;
+      --green: #5bb98c;
+      --orange: #e8a445;
+      --red: #e55a5a;
+      --sidebar-w: 280px;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ── SIDEBAR ─────────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s;
+    }
+
+    .sidebar-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-header h2 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .new-chat-btn {
+      width: 100%;
+      padding: 10px 16px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+    .new-chat-btn:hover { background: var(--bg-hover); }
+
+    .chat-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .chat-item {
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-secondary);
+      transition: background 0.15s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .chat-item:hover { background: var(--bg-hover); }
+    .chat-item.active { background: var(--bg-hover); color: var(--text-primary); }
+
+    .chat-item .delete-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px 4px;
+    }
+    .chat-item:hover .delete-btn { display: block; }
+    .chat-item .delete-btn:hover { color: var(--red); }
+
+    .capsule-pills {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .capsule-pill {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      background: var(--bg-tertiary);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    /* ── MAIN AREA ───────────────────────────────────── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .chat-header {
+      padding: 12px 24px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      scroll-behavior: smooth;
+    }
+
+    .welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      gap: 12px;
+    }
+    .welcome h1 {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .welcome p { color: var(--text-muted); font-size: 15px; max-width: 480px; }
+
+    .msg {
+      max-width: 780px;
+      margin: 0 auto 24px;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .msg-user {
+      display: flex;
+      justify-content: flex-end;
+    }
+    .msg-user .msg-bubble {
+      background: var(--bg-input);
+      border-radius: 18px 18px 4px 18px;
+      padding: 12px 18px;
+      max-width: 65%;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .msg-expert {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .msg-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent-dim), #5b4a9e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .msg-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .msg-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .domain-badge {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 10px;
+      font-weight: 600;
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+    .confidence-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 10px;
+      background: var(--bg-tertiary);
+      color: var(--green);
+      border: 1px solid #2d4a3a;
+    }
+    .layer-badge {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .msg-answer {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--text-primary);
+    }
+    .msg-answer h1, .msg-answer h2, .msg-answer h3 { margin: 16px 0 8px; font-size: 16px; }
+    .msg-answer p { margin-bottom: 10px; }
+    .msg-answer ul, .msg-answer ol { margin: 8px 0 8px 20px; }
+    .msg-answer li { margin-bottom: 4px; }
+    .msg-answer code { background: var(--bg-input); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+    .msg-answer pre { background: var(--bg-input); padding: 14px; border-radius: 8px; overflow-x: auto; margin: 10px 0; }
+    .msg-answer pre code { background: none; padding: 0; }
+    .msg-answer blockquote { border-left: 3px solid var(--accent-dim); padding-left: 14px; color: var(--text-secondary); margin: 10px 0; }
+    .msg-answer table { border-collapse: collapse; margin: 10px 0; width: 100%; }
+    .msg-answer th, .msg-answer td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; font-size: 13px; }
+    .msg-answer th { background: var(--bg-tertiary); }
+
+    .msg-warnings {
+      margin-top: 10px;
+      padding: 10px 14px;
+      background: #2a2117;
+      border: 1px solid #4a3a20;
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--orange);
+    }
+    .msg-warnings div { margin-bottom: 4px; }
+
+    .msg-sources {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .msg-sources span { color: var(--text-secondary); }
+
+    .typing-indicator {
+      display: flex;
+      gap: 4px;
+      padding: 20px 0;
+      max-width: 780px;
+      margin: 0 auto;
+      align-items: center;
+    }
+    .typing-indicator .msg-avatar { margin-right: 8px; }
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--text-muted);
+      border-radius: 50%;
+      animation: bounce 1.2s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.15s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-6px); }
+    }
+
+    /* ── INPUT BAR ───────────────────────────────────── */
+    .input-area {
+      padding: 16px 24px 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .input-wrap {
+      max-width: 780px;
+      margin: 0 auto;
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .input-box {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 4px;
+      transition: border-color 0.2s;
+    }
+    .input-box:focus-within { border-color: var(--accent-dim); }
+
+    #query-input {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: inherit;
+      padding: 10px 14px;
+      resize: none;
+      max-height: 120px;
+      line-height: 1.5;
+      outline: none;
+    }
+    #query-input::placeholder { color: var(--text-muted); }
+
+    .send-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--accent);
+      border: none;
+      color: #000;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+    }
+    .send-btn:disabled { opacity: 0.3; cursor: default; }
+    .send-btn:not(:disabled):hover { opacity: 0.85; }
+
+    .input-footer {
+      max-width: 780px;
+      margin: 8px auto 0;
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ── SCROLLBAR ────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* ── MOBILE ───────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .sidebar { position: absolute; z-index: 10; height: 100%; transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .menu-toggle { display: block !important; }
+    }
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 20px;
+      cursor: pointer;
+      padding: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h2>🧬 SME-PLUG</h2>
+      <button class="new-chat-btn" onclick="newChat()">
+        <span>＋</span> New Chat
+      </button>
+    </div>
+    <div class="chat-list" id="chat-list"></div>
+    <div class="capsule-pills" id="capsule-pills"></div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="chat-header">
+      <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+      <span id="chat-title">New Chat</span>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcome">
+        <h1>SME-PLUG</h1>
+        <p>Ask any question across your expert domains — cricket, tax, cybersecurity, legal, or structural engineering. The system auto-detects the domain and responds with cited expertise.</p>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-wrap">
+        <div class="input-box">
+          <textarea id="query-input" rows="1" placeholder="Ask your expert question..." onkeydown="handleKey(event)"></textarea>
+          <button class="send-btn" id="send-btn" onclick="sendQuery()" disabled>↑</button>
+        </div>
+      </div>
+      <div class="input-footer">Powered by Groq Llama 3.1 · Auto-detects domain from 5 expert capsules</div>
+    </div>
+  </main>
+
+<script>
+  const API = window.location.origin;
+  let chats = JSON.parse(localStorage.getItem('sme_chats') || '{}');
+  let currentChatId = null;
+  let isLoading = false;
+
+  // ── Init ──────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    loadCapsules();
+    renderChatList();
+    autoResize(document.getElementById('query-input'));
+  });
+
+  async function loadCapsules() {
+    try {
+      const r = await fetch(`${API}/capsules`);
+      const data = await r.json();
+      const el = document.getElementById('capsule-pills');
+      const icons = { cybersecurity: '🛡️', legal: '⚖️', structural_engineering: '🏗️', us_tax: '💰', cricket: '🏏' };
+      el.innerHTML = data.map(c => `<span class="capsule-pill">${icons[c.domain_id] || '📦'} ${c.name}</span>`).join('');
+    } catch (e) { console.warn('Could not load capsules', e); }
+  }
+
+  // ── Chat Management ───────────────────────────────
+  function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+  function newChat() {
+    currentChatId = null;
+    document.getElementById('messages').innerHTML = `
+      <div class="welcome" id="welcome">
+        <h1>SME-PLUG</h1>
+        <p>Ask any question across your expert domains — cricket, tax, cybersecurity, legal, or structural engineering.</p>
+      </div>`;
+    document.getElementById('chat-title').textContent = 'New Chat';
+    document.getElementById('sidebar').classList.remove('open');
+    renderChatList();
+  }
+
+  function loadChat(id) {
+    currentChatId = id;
+    const chat = chats[id];
+    if (!chat) return;
+    document.getElementById('chat-title').textContent = chat.title;
+    const el = document.getElementById('messages');
+    el.innerHTML = '';
+    chat.messages.forEach(m => {
+      if (m.role === 'user') appendUserMsg(m.text, false);
+      else appendExpertMsg(m.data, false);
+    });
+    el.scrollTop = el.scrollHeight;
+    document.getElementById('sidebar').classList.remove('open');
+    renderChatList();
+  }
+
+  function deleteChat(id, e) {
+    e.stopPropagation();
+    delete chats[id];
+    save();
+    if (currentChatId === id) newChat();
+    else renderChatList();
+  }
+
+  function save() {
+    localStorage.setItem('sme_chats', JSON.stringify(chats));
+    renderChatList();
+  }
+
+  function renderChatList() {
+    const el = document.getElementById('chat-list');
+    const ids = Object.keys(chats).sort((a, b) => chats[b].ts - chats[a].ts);
+    el.innerHTML = ids.map(id => `
+      <div class="chat-item ${id === currentChatId ? 'active' : ''}" onclick="loadChat('${id}')">
+        <span>${chats[id].title}</span>
+        <button class="delete-btn" onclick="deleteChat('${id}', event)">✕</button>
+      </div>
+    `).join('');
+  }
+
+  // ── Input ─────────────────────────────────────────
+  function autoResize(el) {
+    el.addEventListener('input', () => {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+      document.getElementById('send-btn').disabled = !el.value.trim();
+    });
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (!isLoading && document.getElementById('query-input').value.trim()) sendQuery();
+    }
+  }
+
+  // ── Send Query ────────────────────────────────────
+  async function sendQuery() {
+    const input = document.getElementById('query-input');
+    const query = input.value.trim();
+    if (!query || isLoading) return;
+
+    isLoading = true;
+    input.value = '';
+    input.style.height = 'auto';
+    document.getElementById('send-btn').disabled = true;
+
+    // Create chat if new
+    if (!currentChatId) {
+      currentChatId = genId();
+      chats[currentChatId] = { title: query.slice(0, 40) + (query.length > 40 ? '…' : ''), ts: Date.now(), messages: [] };
+      document.getElementById('chat-title').textContent = chats[currentChatId].title;
+      const welcome = document.getElementById('welcome');
+      if (welcome) welcome.remove();
+    }
+
+    // Append user msg
+    chats[currentChatId].messages.push({ role: 'user', text: query });
+    chats[currentChatId].ts = Date.now();
+    save();
+    appendUserMsg(query);
+
+    // Show typing
+    showTyping();
+
+    try {
+      const r = await fetch(`${API}/query`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query }),
+      });
+      const data = await r.json();
+      hideTyping();
+
+      if (data.answer) {
+        chats[currentChatId].messages.push({ role: 'expert', data });
+        save();
+        appendExpertMsg(data);
+      } else if (data.message) {
+        // Clarification
+        const clarData = { answer: data.message, domain_name: 'Clarification', confidence_score: 0, detection_layer: 0, citations: [], guardrail_warnings: [], decision_tree_path: [] };
+        chats[currentChatId].messages.push({ role: 'expert', data: clarData });
+        save();
+        appendExpertMsg(clarData);
+      }
+    } catch (e) {
+      hideTyping();
+      const errData = { answer: `**Error:** Could not reach the API server.\n\n\`${e.message}\`\n\nMake sure the server is running: \`python main.py api\``, domain_name: 'Error', confidence_score: 0, detection_layer: 0, citations: [], guardrail_warnings: [], decision_tree_path: [] };
+      appendExpertMsg(errData);
+    }
+
+    isLoading = false;
+  }
+
+  // ── Message Rendering ─────────────────────────────
+  function appendUserMsg(text, scroll = true) {
+    const el = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = 'msg msg-user';
+    div.innerHTML = `<div class="msg-bubble">${escHtml(text)}</div>`;
+    el.appendChild(div);
+    if (scroll) el.scrollTop = el.scrollHeight;
+  }
+
+  function appendExpertMsg(data, scroll = true) {
+    const el = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = 'msg msg-expert';
+
+    const layerNames = { 0: '', 1: 'Keyword', 2: 'LLM', 3: 'Embedding' };
+    const layerStr = layerNames[data.detection_layer] || '';
+
+    let html = `<div class="msg-avatar">🧬</div><div class="msg-body">`;
+
+    if (data.domain_name && data.domain_name !== 'Error' && data.domain_name !== 'Clarification') {
+      html += `<div class="msg-meta">
+        <span class="domain-badge">${escHtml(data.domain_name)}</span>
+        <span class="confidence-badge">⚡ ${(data.confidence_score * 100).toFixed(0)}%</span>
+        ${layerStr ? `<span class="layer-badge">L${data.detection_layer}: ${layerStr}</span>` : ''}
+      </div>`;
+    }
+
+    html += `<div class="msg-answer">${marked.parse(data.answer || '')}</div>`;
+
+    if (data.guardrail_warnings && data.guardrail_warnings.length > 0) {
+      html += `<div class="msg-warnings">${data.guardrail_warnings.map(w => `<div>⚠️ ${escHtml(w)}</div>`).join('')}</div>`;
+    }
+
+    if (data.citations && data.citations.length > 0) {
+      const sources = [...new Set(data.citations.map(c => c.source))];
+      html += `<div class="msg-sources">📚 <span>${sources.join(', ')}</span></div>`;
+    }
+
+    html += `</div>`;
+    div.innerHTML = html;
+    el.appendChild(div);
+    if (scroll) el.scrollTop = el.scrollHeight;
+  }
+
+  function showTyping() {
+    const el = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.id = 'typing';
+    div.className = 'typing-indicator';
+    div.innerHTML = `<div class="msg-avatar">🧬</div><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>`;
+    el.appendChild(div);
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function hideTyping() {
+    const t = document.getElementById('typing');
+    if (t) t.remove();
+  }
+
+  function escHtml(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+</script>
+</body>
+</html>
