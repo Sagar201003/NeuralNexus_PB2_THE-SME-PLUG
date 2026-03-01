@@ -57,11 +57,7 @@ class DomainResult:
 # ─────────────────────────────────────────────────────────────────────────────
 
 class DomainRouter:
-    """
-    Automatically detects the best-matching domain capsule for a given query
-    using a 3-layer cascade. Gracefully degrades from fast keyword matching
-    to LLM classification to embedding similarity.
-    """
+    
 
     CONFIDENCE_THRESHOLD = float(os.getenv("CONFIDENCE_THRESHOLD", "0.55"))
     MULTI_DOMAIN_THRESHOLD = float(os.getenv("MULTI_DOMAIN_THRESHOLD", "0.70"))  # both domains above this → multi
@@ -92,7 +88,6 @@ class DomainRouter:
                 for p in cfg.triggers.regex_patterns
             ]
 
-        # Pre-compute seed embeddings (L3) — only if seed queries exist
         all_have_seeds = any(cfg.triggers.seed_queries for cfg in self._capsules.values())
         if all_have_seeds:
             logger.info(f"Computing seed query embeddings for L3 detection (device={_DEVICE})...")
@@ -131,14 +126,12 @@ class DomainRouter:
             logger.info(f"[L2] Domain detected: {l2_matches[0].domain_id} (conf={l2_matches[0].confidence:.2f})")
             return self._build_result(l2_matches)
 
-        # Layer 3: Embedding similarity
         if self._seed_embeddings:
             l3_matches = self._layer3_embedding(query)
             if l3_matches and l3_matches[0].confidence >= self.CONFIDENCE_THRESHOLD:
                 logger.info(f"[L3] Domain detected: {l3_matches[0].domain_id} (conf={l3_matches[0].confidence:.2f})")
                 return self._build_result(l3_matches)
 
-        # Fallback: request clarification
         logger.warning("All layers failed to detect domain with sufficient confidence.")
         available = ", ".join(
             f"'{cfg.name}'" for cfg in self._capsules.values()
@@ -152,7 +145,6 @@ class DomainRouter:
             ),
         )
 
-    # ── Layer 1: Keyword / Regex ───────────────────────────────────────────────
 
     def _layer1_keyword(self, query: str) -> list[DomainMatch]:
         query_lower = query.lower()
@@ -182,7 +174,6 @@ class DomainRouter:
 
         return sorted(results, key=lambda x: x.confidence, reverse=True)
 
-    # ── Layer 2: Zero-Shot LLM Classifier ─────────────────────────────────────
 
     def _layer2_llm(self, query: str) -> list[DomainMatch]:
         domain_list = list(self._capsules.keys())
@@ -234,7 +225,6 @@ class DomainRouter:
 
         return sorted(results, key=lambda x: x.confidence, reverse=True)
 
-    # ── Layer 3: Embedding Cosine Similarity ───────────────────────────────────
 
     def _layer3_embedding(self, query: str) -> list[DomainMatch]:
         if not self._embedder or not self._seed_embeddings:
@@ -256,7 +246,6 @@ class DomainRouter:
 
         return sorted(results, key=lambda x: x.confidence, reverse=True)
 
-    # ── Helpers ────────────────────────────────────────────────────────────────
 
     def _build_result(self, matches: list[DomainMatch]) -> DomainResult:
         """Determine if this is a multi-domain query based on top-2 confidence scores."""
