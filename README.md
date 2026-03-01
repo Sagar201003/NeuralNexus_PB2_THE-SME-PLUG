@@ -148,5 +148,6 @@ expert_agent = adapter.create_expert_agent()
 | GET | `/health` | Health check |
 
 ---
+<img width="1307" height="722" alt="image" src="https://github.com/user-attachments/assets/e287b8fb-fe8e-4e45-8705-72b6cd7f61a5" />
 
 **Built for the SME-PLUG Hackathon Challenge** 🏆
